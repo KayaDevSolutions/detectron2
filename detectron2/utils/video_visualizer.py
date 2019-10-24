@@ -124,6 +124,10 @@ class VideoVisualizer:
     def draw_panoptic_seg_predictions(
         self, frame, panoptic_seg, segments_info, area_threshold=None, alpha=0.5
     ):
+
+
+        # print("\nCheckpoint n---------------------")
+
         frame_visualizer = Visualizer(frame, self.metadata)
         pred = _PanopticPrediction(panoptic_seg, segments_info)
 

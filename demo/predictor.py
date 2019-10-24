@@ -31,8 +31,10 @@ class VisualizationDemo(object):
         if parallel:
             num_gpu = torch.cuda.device_count()
             self.predictor = AsyncPredictor(cfg, num_gpus=num_gpu)
+            print("Running parallelly......")
         else:
             self.predictor = DefaultPredictor(cfg)
+            print("Linear......")
 
     def run_on_image(self, image):
         """
@@ -67,6 +69,7 @@ class VisualizationDemo(object):
 
     def _frame_from_video(self, video):
         while video.isOpened():
+            print("Checkpoint 2------------------")
             success, frame = video.read()
             if success:
                 yield frame
@@ -84,19 +87,35 @@ class VisualizationDemo(object):
         Yields:
             ndarray: BGR visualizations of each video frame.
         """
+
         video_visualizer = VideoVisualizer(self.metadata, self.instance_mode)
 
+        print("Checkpoint 1-------------------------")
+
         def process_predictions(frame, predictions):
+
+            print("Checkpoint 3----------------------")
+
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            
             if "panoptic_seg" in predictions:
+
+                print("Checkpoint 4-------------------")
+               
                 panoptic_seg, segments_info = predictions["panoptic_seg"]
                 vis_frame = video_visualizer.draw_panoptic_seg_predictions(
                     frame, panoptic_seg.to(self.cpu_device), segments_info
                 )
             elif "instances" in predictions:
+
+                print("Checkpoint 4.1-------------------")
+
                 predictions = predictions["instances"].to(self.cpu_device)
                 vis_frame = video_visualizer.draw_instance_predictions(frame, predictions)
             elif "sem_seg" in predictions:
+
+                print("Checkpoint 4.2-------------------")
+
                 vis_frame = video_visualizer.draw_sem_seg(
                     frame, predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
                 )
@@ -117,7 +136,7 @@ class VisualizationDemo(object):
 
                 if cnt >= buffer_size:
                     frame = frame_data.popleft()
-                    predictions = self.predictor.get()
+                    predictions = self.predictor.get()     
                     yield process_predictions(frame, predictions)
 
             while len(frame_data):
@@ -126,6 +145,7 @@ class VisualizationDemo(object):
                 yield process_predictions(frame, predictions)
         else:
             for frame in frame_gen:
+                print("Checkpoint 5-----------------------")
                 yield process_predictions(frame, self.predictor(frame))
 
 
