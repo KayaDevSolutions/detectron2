@@ -63,6 +63,9 @@ class VideoVisualizer:
         Returns:
             output (VisImage): image object with visualizations.
         """
+
+        print("Checkpoint 6-----------------------")
+
         frame_visualizer = Visualizer(frame, self.metadata)
         num_instances = len(predictions)
         if num_instances == 0:
@@ -72,6 +75,8 @@ class VideoVisualizer:
         scores = predictions.scores if predictions.has("scores") else None
         classes = predictions.pred_classes.numpy() if predictions.has("pred_classes") else None
         keypoints = predictions.pred_keypoints if predictions.has("pred_keypoints") else None
+
+        print(boxes)
 
         if predictions.has("pred_masks"):
             masks = predictions.pred_masks

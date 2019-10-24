@@ -34,7 +34,7 @@ class VisualizationDemo(object):
             print("Running parallelly......")
         else:
             self.predictor = DefaultPredictor(cfg)
-            print("Linear......")
+            print("\n\nLinear......")
 
     def run_on_image(self, image):
         """
@@ -94,13 +94,13 @@ class VisualizationDemo(object):
 
         def process_predictions(frame, predictions):
 
-            print("Checkpoint 3----------------------")
+            print("Checkpoint 4----------------------")
 
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             
             if "panoptic_seg" in predictions:
 
-                print("Checkpoint 4-------------------")
+                print("Checkpoint 5.1-------------------")
                
                 panoptic_seg, segments_info = predictions["panoptic_seg"]
                 vis_frame = video_visualizer.draw_panoptic_seg_predictions(
@@ -108,13 +108,16 @@ class VisualizationDemo(object):
                 )
             elif "instances" in predictions:
 
-                print("Checkpoint 4.1-------------------")
+                print("Checkpoint 5.2-------------------")
+                # print(predictions)
+                # print(frame)
 
                 predictions = predictions["instances"].to(self.cpu_device)
                 vis_frame = video_visualizer.draw_instance_predictions(frame, predictions)
+
             elif "sem_seg" in predictions:
 
-                print("Checkpoint 4.2-------------------")
+                print("Checkpoint 5.3-------------------")
 
                 vis_frame = video_visualizer.draw_sem_seg(
                     frame, predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
@@ -145,9 +148,8 @@ class VisualizationDemo(object):
                 yield process_predictions(frame, predictions)
         else:
             for frame in frame_gen:
-                print("Checkpoint 5-----------------------")
+                print("Checkpoint 3-----------------------")
                 yield process_predictions(frame, self.predictor(frame))
-
 
 class AsyncPredictor:
     """
