@@ -124,8 +124,12 @@ class VisualizationDemo(object):
                 )
 
             # Converts Matplotlib RGB format to OpenCV BGR format
+            # print(predictions)
             vis_frame = cv2.cvtColor(vis_frame.get_image(), cv2.COLOR_RGB2BGR)
-            return vis_frame
+            # print("TYPE: ", type(predictions))
+            extracted_obj = vars(predictions)
+            pred = extracted_obj['_fields']
+            return vis_frame, pred
 
         frame_gen = self._frame_from_video(video)
         if self.parallel:

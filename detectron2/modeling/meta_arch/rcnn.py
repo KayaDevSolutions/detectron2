@@ -90,6 +90,7 @@ class GeneralizedRCNN(nn.Module):
         losses = {}
         losses.update(detector_losses)
         losses.update(proposal_losses)
+        # print(losses)
         return losses
 
     def inference(self, batched_inputs, detected_instances=None, do_postprocess=True):
@@ -121,20 +122,28 @@ class GeneralizedRCNN(nn.Module):
                 assert "proposals" in batched_inputs[0]
                 proposals = [x["proposals"].to(self.device) for x in batched_inputs]
 
+            # print(features)
+            # print(proposals)
             results, _ = self.roi_heads(images, features, proposals, None)
+            # print(results)
         else:
             detected_instances = [x.to(self.device) for x in detected_instances]
             results = self.roi_heads.forward_with_given_boxes(features, detected_instances)
+            # print(results)
 
         if do_postprocess:
             processed_results = []
+            # print(results)
             for results_per_image, input_per_image, image_size in zip(
                 results, batched_inputs, images.image_sizes
             ):
                 height = input_per_image.get("height", image_size[0])
                 width = input_per_image.get("width", image_size[1])
+                # print(results_per_image)
                 r = detector_postprocess(results_per_image, height, width)
                 processed_results.append({"instances": r})
+                # print(r)
+                # print(processed_results)
             return processed_results
         else:
             return results

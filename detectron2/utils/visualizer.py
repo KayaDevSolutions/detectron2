@@ -196,7 +196,8 @@ def _create_text_labels(classes, scores, class_names):
         list[str] or None
     """
     labels = None
-    if classes is not None and class_names is not None and len(class_names) > 1:
+    # print(class_names)
+    if classes is not None and class_names is not None and len(class_names) >= 1:
         labels = [class_names[i] for i in classes]
     if scores is not None:
         if labels is None:
@@ -334,6 +335,7 @@ class Visualizer:
         scores = predictions.scores if predictions.has("scores") else None
         classes = predictions.pred_classes if predictions.has("pred_classes") else None
         labels = _create_text_labels(classes, scores, self.metadata.get("thing_classes", None))
+        # print(labels)
         keypoints = predictions.pred_keypoints if predictions.has("pred_keypoints") else None
 
         if predictions.has("pred_masks"):
@@ -385,6 +387,7 @@ class Visualizer:
         labels, areas = np.unique(sem_seg, return_counts=True)
         sorted_idxs = np.argsort(-areas).tolist()
         labels = labels[sorted_idxs]
+        
         for label in labels:
             try:
                 mask_color = [x / 255 for x in self.metadata.stuff_colors[label]]
@@ -533,6 +536,10 @@ class Visualizer:
         Returns:
             output (VisImage): image object with visualizations.
         """
+
+        # print(boxes)
+        # print(keypoints)
+
         num_instances = None
         if boxes is not None:
             boxes = self._convert_boxes(boxes)
@@ -572,6 +579,7 @@ class Visualizer:
             # Re-order overlapped instances in descending order.
             boxes = boxes[sorted_idxs] if boxes is not None else None
             labels = [labels[k] for k in sorted_idxs] if labels is not None else None
+            # print(labels)
             masks = [masks[idx] for idx in sorted_idxs] if masks is not None else None
             assigned_colors = [assigned_colors[idx] for idx in sorted_idxs]
             keypoints = keypoints[sorted_idxs] if keypoints is not None else None
@@ -586,6 +594,7 @@ class Visualizer:
                     self.draw_polygon(segment.reshape(-1, 2), color, alpha=alpha)
 
             if labels is not None:
+                # print(labels)
                 # first get a box
                 if boxes is not None:
                     x0, y0, x1, y1 = boxes[i]

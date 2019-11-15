@@ -6,6 +6,7 @@ import os
 import time
 import cv2
 import tqdm
+import numpy 
 
 from detectron2.config import get_cfg
 from detectron2.data.detection_utils import read_image
@@ -103,9 +104,25 @@ if __name__ == "__main__":
     elif args.webcam:
         assert args.input is None, "Cannot have both --input and --webcam!"
         cam = cv2.VideoCapture(0)
-        for vis in tqdm.tqdm(demo.run_on_video(cam)):
+        for vis, pred in tqdm.tqdm(demo.run_on_video(cam)):
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, vis)
+
+            _bboxes = pred['pred_boxes']
+            _keypoints = pred['pred_keypoints']
+
+            # print("TYPE: ", type(_bboxes))
+            # print(_bboxes)
+            
+            _extracted_obj = vars(_bboxes)
+            _extracted_bboxes = _extracted_obj['tensor']
+            
+            bboxes = _extracted_bboxes.numpy()
+            keypoints = _keypoints.numpy()
+
+            print(bboxes)
+            print(keypoints)
+
             if cv2.waitKey(1) == 27:
                 break  # esc to quit
         cv2.destroyAllWindows()
